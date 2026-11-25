@@ -1,0 +1,8 @@
+{
+  "api_url": "https://api.tvmaze.com/search/shows",
+  "user_agent": "TVMazeShowSearch/1.0",
+  "timeout_seconds": 10,
+  "source_url": "https://www.tvmaze.com/",
+  "missing_value": "Not available",
+  "rating_max": 10
+}
