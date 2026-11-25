@@ -26,6 +26,32 @@ Matches are displayed in TVMaze's relevance order. Missing genres or ratings app
 
 The application loads its constants from `constants.json` beside the script, regardless of the current working directory. Keep this file with the script. It contains the API URL, user agent, request timeout, attribution URL, missing-value text and rating scale. A missing or invalid file is reported as an error.
 
+## Logging
+
+The application logs all significant operations and errors using the `logging` module. By default, only WARNING level and above are displayed. To see more detailed information, modify the `logging.basicConfig()` call in `main()`:
+
+```python
+logging.basicConfig(level=logging.DEBUG)  # Show DEBUG and above
+logging.basicConfig(level=logging.INFO)   # Show INFO and above
+```
+
+Log entries include:
+- **INFO**: Constants loaded, searches performed, results found
+- **WARNING**: Invalid response structures from TVMaze
+- **ERROR**: Failed requests, missing files, invalid configuration
+
+Sensitive data (passwords, API keys) is never logged.
+
+## Error handling
+
+The application handles errors gracefully with specific exception types:
+
+- **ConstantsLoadError**: Raised when the constants file cannot be loaded or contains invalid values. The error message explains what is wrong.
+- **InvalidResponseError**: Raised when TVMaze returns an unexpected response format. The error message describes the specific validation failure.
+- **requests.RequestException**: Raised for network failures (timeout, connection refused, etc.) and HTTP errors (4xx, 5xx status codes).
+
+All exceptions are caught in `main()`, logged appropriately, and reported to the user on standard error with a non-zero exit code.
+
 ## Sample output
 
 The following is an example of a live search; results and ratings can change.
@@ -66,7 +92,7 @@ Rating: Not available
 Data provided by TVMaze: https://www.tvmaze.com/
 ```
 
-## JSON structure (AI-written explanation)
+## JSON structure
 
 The [TVMaze show search endpoint](https://www.tvmaze.com/api#show-search) returns a JSON array, which `requests` converts into a Python list of dictionaries. Each item contains a search relevance `score` and a nested `show` object. For example, with unrelated fields omitted:
 

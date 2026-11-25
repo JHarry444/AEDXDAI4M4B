@@ -1,3 +1,5 @@
+"""Tests for tvmaze_search module."""
+
 import contextlib
 import io
 import json
@@ -14,9 +16,20 @@ else:
 
 
 class SearchTests(unittest.TestCase):
+    """Test suite for TVMaze search functionality."""
+
     def run_main(
         self, args: list[str], response: Mock
     ) -> tuple[int, str, str, Union[MagicMock, AsyncMock]]:
+        """Run main() with mocked arguments and requests.
+
+        Args:
+            args: Command-line arguments (without program name).
+            response: Mocked requests.Response object.
+
+        Returns:
+            tuple: (exit_code, stdout, stderr, mock_get_call)
+        """
         stdout, stderr = io.StringIO(), io.StringIO()
         with patch("sys.argv", ["tvmaze_search.py", *args]), \
                 patch.object(tvmaze_search.requests, "get", return_value=response) as get, \
@@ -25,6 +38,7 @@ class SearchTests(unittest.TestCase):
         return status, stdout.getvalue(), stderr.getvalue(), get
 
     def test_multiple_matches_and_missing_values(self) -> None:
+        """Test formatting multiple results with missing values."""
         response = Mock()
         response.json.return_value = [
             {"score": 1.0, "show": {"name": "First", "genres": ["Drama", "Crime"],
@@ -43,6 +57,7 @@ class SearchTests(unittest.TestCase):
         self.assertEqual(get.call_args.kwargs["timeout"], 10)
 
     def test_no_matches(self) -> None:
+        """Test handling of empty search results."""
         response = Mock()
         response.json.return_value = []
         status, stdout, stderr, _ = self.run_main(["no-match"], response)
@@ -51,6 +66,7 @@ class SearchTests(unittest.TestCase):
         self.assertEqual(stderr, "")
 
     def test_http_failure_is_reported(self) -> None:
+        """Test HTTP errors are caught and reported."""
         response = Mock()
         response.raise_for_status.side_effect = requests.HTTPError("429 Too Many Requests")
         status, stdout, stderr, _ = self.run_main(["test"], response)
@@ -59,6 +75,7 @@ class SearchTests(unittest.TestCase):
         self.assertIn("429 Too Many Requests", stderr)
 
     def test_connection_failure_is_reported(self) -> None:
+        """Test connection timeouts are caught and reported."""
         stdout, stderr = io.StringIO(), io.StringIO()
         with patch("sys.argv", ["tvmaze_search.py", "test"]), \
                 patch.object(tvmaze_search.requests, "get", side_effect=requests.Timeout("timed out")), \
@@ -69,6 +86,7 @@ class SearchTests(unittest.TestCase):
         self.assertIn("timed out", stderr.getvalue())
 
     def test_missing_rating_and_zero_rating(self) -> None:
+        """Test handling of missing and zero ratings."""
         constants = tvmaze_search.load_constants()
         self.assertIn("Rating: Not available", tvmaze_search.format_show(
             {"show": {"name": "Unrated"}}, constants))
@@ -76,6 +94,7 @@ class SearchTests(unittest.TestCase):
             {"show": {"name": "Rated", "rating": {"average": 0}}}, constants))
 
     def test_invalid_json_and_response_shape_are_reported(self) -> None:
+        """Test various invalid response formats are caught and reported."""
         for value in (ValueError("bad JSON"), {"show": "not a list"},
                       [{"show": {"name": "Broken", "genres": "Drama"}}],
                       [{"show": {"name": "Broken", "genres": ["Drama", 42]}}],
@@ -92,6 +111,7 @@ class SearchTests(unittest.TestCase):
                 self.assertIn("Could not read the TVMaze response", stderr)
 
     def test_constants_from_json_are_used(self) -> None:
+        """Test that custom constants are loaded and used correctly."""
         constants = {
             "api_url": "https://example.test/search",
             "user_agent": "TestApp/1.0",
@@ -117,6 +137,7 @@ class SearchTests(unittest.TestCase):
                 tvmaze_search.load_constants()))
 
     def test_invalid_or_missing_constants_are_reported(self) -> None:
+        """Test that invalid or missing constants are reported as errors."""
         invalid_timeout = {
             "api_url": "https://example.test/search", "user_agent": "TestApp/1.0",
             "timeout_seconds": -1, "source_url": "https://example.test/",
