@@ -1,0 +1,7 @@
+{
+  "api_base_url": "https://site.api.espn.com/apis/site/v2/sports/soccer",
+  "user_agent": "FootballMatchMonitor/1.0",
+  "timeout_seconds": 10,
+  "missing_value": "Not available",
+  "log_file": "automation.log"
+}

@@ -1,0 +1,56 @@
+Football Match Monitor - Test Results
+
+Test: Unit test suite
+Expected: 9 unit tests pass
+Actual: 9 unit tests passed
+Pass/Fail: Pass
+
+Test: Scottish league
+Expected: ESPN URL is sco.1/scoreboard and the script connects successfully
+Actual: Live run used sco.1 and completed successfully
+Pass/Fail: Pass
+
+Test: English league
+Expected: ESPN URL is eng.1/scoreboard and the script connects successfully
+Actual: Live run used eng.1 and completed successfully
+Pass/Fail: Pass
+
+Test: Valid team
+Expected: Celtic matches are displayed and reported
+Actual: Unit test matched Celtic case-insensitively
+Pass/Fail: Pass
+
+Test: Invalid team
+Expected: No matching report entries are generated
+Actual: Aberdeen/Arsenal test-style cases produced no matches
+Pass/Fail: Pass
+
+Test: Report created
+Expected: Configured output file exists
+Actual: football_report.txt was created in ball_automation
+Pass/Fail: Pass
+
+Test: Team filter
+Expected: Only matches involving the selected team are retained
+Actual: Celtic filter unit test retained the Celtic match
+Pass/Fail: Pass
+
+Test: Configuration loaded
+Expected: Valid config.json settings are used
+Actual: League, team filter and output file loaded successfully
+Pass/Fail: Pass
+
+Test: Missing configuration
+Expected: Script reports an error, does not call ESPN and exits non-zero
+Actual: Missing config produced an error, no API call and exit status 1
+Pass/Fail: Pass
+
+Test: API returned data
+Expected: ESPN JSON can be decoded and processed
+Actual: Live Scottish and English requests completed; schedule produced no matching Celtic/Arsenal events
+Pass/Fail: Pass
+
+Test: Logging
+Expected: Startup, league, match count and errors are logged
+Actual: automation.log contains script and league activity plus missing-config error evidence
+Pass/Fail: Pass
